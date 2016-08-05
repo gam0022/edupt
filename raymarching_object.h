@@ -14,25 +14,26 @@ namespace edupt {
 
 struct RaymarchingObject : public Object {
 public:
-	static const int kREP = 64 * 2;
+	static const int kREP = 128;
 
 	RaymarchingObject(const Color &emission, const Color &color, const ReflectionType reflection_type) : Object(emission, color, reflection_type) {
 	}
 
-	double distanceFunction(const Vec &position) const {
-		return (position - Vec(77, 16.5, 78)).length() - 16.5;
+	virtual double distanceFunction(const Vec &position) const {
+		return 0.0;
 	}
 
-	Vec calcNormal(const Vec &position) const {
-		return normalize(Vec(
-			distanceFunction(position + Vec( kEPS, 0.0, 0.0 ) ) - distanceFunction(position + Vec( -kEPS, 0.0, 0.0 ) ),
-			distanceFunction(position + Vec( 0.0, kEPS, 0.0 ) ) - distanceFunction(position + Vec( 0.0, -kEPS, 0.0 ) ),
-			distanceFunction(position + Vec( 0.0, 0.0, kEPS ) ) - distanceFunction(position + Vec( 0.0, 0.0, -kEPS ) )
-		));
-	}
-
+	Vec calcNormal(const Vec &position) const;
 	bool intersect(const Ray &ray, Hitpoint *hitpoint) const;
 };
+
+Vec RaymarchingObject::calcNormal(const Vec &position) const {
+	return normalize(Vec(
+		distanceFunction(position + Vec(kEPS, 0.0, 0.0)) - distanceFunction(position + Vec(-kEPS, 0.0, 0.0)),
+		distanceFunction(position + Vec(0.0, kEPS, 0.0)) - distanceFunction(position + Vec(0.0, -kEPS, 0.0)),
+		distanceFunction(position + Vec(0.0, 0.0, kEPS)) - distanceFunction(position + Vec(0.0, 0.0, -kEPS))
+	));
+}
 
 bool RaymarchingObject::intersect(const Ray &ray, Hitpoint *hitpoint) const {
 	double d;
